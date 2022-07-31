@@ -1,0 +1,127 @@
+# Notes for the type of commands we are taught.
+# using a find function in this document, look for #! this will show the actual commands used.
+
+
+
+
+
+
+#for logs
+	#log analysis
+		
+		# cd into the log directory
+			#! cd /var/log
+
+		# log into root, Or used sudo on every command
+			#! sudo su
+
+		# to show logins and the mechanisms used	
+			#! cat /auth.log | less
+
+		# cat the auth.log file, grep to look for opened connections, grep the username in our case student, word count to look for how many times its happened.
+
+			#! cat auth.log | grep opened | grep student | wc -l
+				
+				student@lin-ops /v/log ❯❯❯ sudo cat auth.log | grep opened | grep student | wc -l
+				89
+				student@lin-ops /v/log ❯❯❯ 
+
+
+		# cat the auth.log file, grep for the failed attempts, word count to see how many times its happened
+			
+			#! cat auth.log | grep failure | wc -l
+
+				student@lin-ops /v/log ❯❯❯ sudo cat auth.log | grep failure | wc -l
+				19
+				student@lin-ops /v/log ❯❯❯ 
+
+		# same thing just showing how many cron jobs are running
+
+			#! cat auth.log | grep cron | wc -l
+
+				student@lin-ops /v/log ❯❯❯ sudo cat auth.log | grep cron | wc -l
+				172
+				student@lin-ops /v/log ❯❯❯ 
+
+		# using 'tail -f auth.log' gives us a live log for logins.
+
+			#! tail -f auth.log 
+
+				student@lin-ops /v/log ❯❯❯ sudo tail -f auth.log
+				Jul 29 19:17:01 lin-ops CRON[20451]: pam_unix(cron:session): session opened for user root by (uid=0)
+				Jul 29 19:17:01 lin-ops CRON[20451]: pam_unix(cron:session): session closed for user root
+				Jul 29 19:17:19 lin-ops sudo:  student : TTY=pts/0 ; PWD=/var/log ; USER=root ; COMMAND=/bin/cat auth.log
+				Jul 29 19:17:19 lin-ops sudo: pam_unix(sudo:session): session opened for user root by student(uid=0)
+				Jul 29 19:17:19 lin-ops sudo: pam_unix(sudo:session): session closed for user root
+				Jul 29 19:18:18 lin-ops sudo:  student : TTY=pts/0 ; PWD=/var/log ; USER=root ; COMMAND=/usr/bin/tail -f auth.log
+				Jul 29 19:18:18 lin-ops sudo: pam_unix(sudo:session): session opened for user root by student(uid=0)
+				Jul 29 19:18:28 lin-ops sudo: pam_unix(sudo:session): session closed for user root
+				Jul 29 19:18:35 lin-ops sudo:  student : TTY=pts/0 ; PWD=/var/log ; USER=root ; COMMAND=/usr/bin/tail -f auth.log
+				Jul 29 19:18:35 lin-ops sudo: pam_unix(sudo:session): session opened for user root by student(uid=0)
+				Jul 29 19:18:54 lin-ops sshd[20519]: Accepted password for student from 192.168.245.11 port 54618 ssh2
+				Jul 29 19:18:54 lin-ops sshd[20519]: pam_unix(sshd:session): session opened for user student by (uid=0)
+				Jul 29 19:18:54 lin-ops systemd-logind[974]: New session 68 of user student.
+				Jul 29 19:19:07 lin-ops su[20601]: Successful su for root by student
+				Jul 29 19:19:07 lin-ops su[20601]: + /dev/pts/1 student:root
+				Jul 29 19:19:07 lin-ops su[20601]: pam_unix(su:session): session opened for user root by student(uid=1001)
+				Jul 29 19:19:07 lin-ops su[20601]: pam_systemd(su:session): Cannot create session: Already running in a session
+				^C⏎
+				student@lin-ops /v/log ❯❯❯ 
+
+
+		# using grep to find specific ip addresses from our ssh login attempts. 
+
+			#! grep ssh auth.log | grep -o '[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}' | sort | uniq -c
+
+				student@lin-ops /v/log ❯❯❯ sudo grep ssh auth.log | grep -o '[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}' | sort | uniq -c
+				      2 0.0.0.0
+				      5 10.50.23.46
+				     10 10.50.39.235
+				     23 10.50.40.98
+				     23 192.168.245.11
+				student@lin-ops /v/log ❯❯❯ 
+
+
+		# using the same method as above, just looking at the failed attempts. sorting them and putting the output into a file called failed_ip.txt (note the /home/student blabla is required as a normal user can not make a file in /var/log/)
+
+			#! grep ssh /var/log/auth.log | grep -i failed | grep -o '[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}' | sort | uniq > /home/student/Desktop/failed_ip.txt
+
+				student@lin-ops /v/log ❯❯❯ sudo grep ssh /var/log/auth.log | grep -i failed | grep -o '[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}' | sort | uniq > /home/student/Desktop/failed_ip.txt
+				student@lin-ops /v/log ❯❯❯ cat /home/student/Desktop/failed_ip.txt 
+				10.50.23.46
+				10.50.40.98
+				192.168.245.11
+				student@lin-ops /v/log ❯❯❯ 
+
+
+		# we cant use this file we just created above to see if anyone from the ip address was able to get in. 
+
+			#! grep -f /home/student/Desktop/failed_ip.txt auth.log | grep Accepted'
+
+				student@lin-ops /v/log ❯❯❯ sudo grep -f /home/student/Desktop/failed_ip.txt auth.log | grep Accepted
+				Jul 26 14:59:05 lin-ops sshd[5177]: Accepted password for student from 192.168.245.11 port 41834 ssh2
+				Jul 26 18:37:38 lin-ops sshd[5975]: Accepted password for student from 192.168.245.11 port 58062 ssh2
+				Jul 27 13:18:11 lin-ops sshd[8482]: Accepted password for student from 192.168.245.11 port 37914 ssh2
+				Jul 27 13:37:44 lin-ops sshd[16673]: Accepted password for student from 192.168.245.11 port 33032 ssh2
+				Jul 27 19:45:36 lin-ops sshd[2257]: Accepted password for student from 192.168.245.11 port 52374 ssh2
+				Jul 28 14:03:59 lin-ops sshd[22466]: Accepted password for student from 192.168.245.11 port 39976 ssh2
+				Jul 28 14:49:11 lin-ops sshd[30043]: Accepted password for student from 192.168.245.11 port 40052 ssh2
+				Jul 29 19:10:43 lin-ops sshd[20040]: Accepted password for student from 192.168.245.11 port 56154 ssh2
+				Jul 29 19:18:54 lin-ops sshd[20519]: Accepted password for student from 192.168.245.11 port 54618 ssh2
+				student@lin-ops /v/log ❯❯❯ 
+
+		# for this one we need to create a keyword_file.txt with some keywords in it, also it needs to be somewhere other then the /var/log/ dir.
+
+			#! echo 'Failed, Denied, Error, Segfault' >> /home/student/Desktop/keyword_file.txt
+
+				student@lin-ops /v/log ❯❯❯ echo 'Failed, Denied, Error, Segfault' >> /home/student/Desktop/keyword_file.txt
+				student@lin-ops /v/log ❯❯❯ cat /home/student/Desktop/keyword_file.txt 
+				Failed, Denied, Error, Segfault
+				student@lin-ops /v/log ❯❯❯ 
+
+		# 
+
+				#! student@lin-ops /v/log ❯❯❯ sudo grep -if /home/student/Desktop/keyword_file.txt ./syslog1
+				grep: ./syslog1: No such file or directory
+				student@lin-ops /v/log ❯❯❯ 
+
