@@ -1,5 +1,5 @@
 # Notes for the type of commands we are taught.
-# using a find function in this document, look for #! this will show the actual commands used.
+# using a "grep -B2 '#!'" function in this document, look for #! this will show the actual commands used.
 
 
 
@@ -10,12 +10,15 @@
 	#log analysis
 		
 		# cd into the log directory
+			
 			#! cd /var/log
 
 		# log into root, Or used sudo on every command
+			
 			#! sudo su
 
 		# to show logins and the mechanisms used	
+			
 			#! cat /auth.log | less
 
 		# cat the auth.log file, grep to look for opened connections, grep the username in our case student, word count to look for how many times its happened.
@@ -119,7 +122,7 @@
 				Failed, Denied, Error, Segfault
 				student@lin-ops /v/log ❯❯❯ 
 
-		# 
+		# STARTHERE
 
 				#! student@lin-ops /v/log ❯❯❯ sudo grep -if /home/student/Desktop/keyword_file.txt ./syslog1
 				grep: ./syslog1: No such file or directory
