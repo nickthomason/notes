@@ -122,9 +122,41 @@
 				Failed, Denied, Error, Segfault
 				student@lin-ops /v/log ❯❯❯ 
 
-		# STARTHERE
+		# this on didnt work for me and im unsure why.
 
 				#! student@lin-ops /v/log ❯❯❯ sudo grep -if /home/student/Desktop/keyword_file.txt ./syslog1
 				grep: ./syslog1: No such file or directory
 				student@lin-ops /v/log ❯❯❯ 
 
+		# Journalctl is used for managing syslogs.
+
+			# here are the options for journalctl that we are shown in the slides.
+
+				#! journalctl	--help
+
+					shows help screen
+
+				#! journalctl	-u dhcpcd
+					
+					Entries associated with unit
+
+				#! journalctl	-p crit
+
+					Entries associated with severity
+
+				#! journalctl	--since ??
+
+					view entries since an event/date
+
+				#! journalctl	--until ??
+
+					view entries up to an event/date
+
+				#! journalctl	--vacuum-time=5d
+
+					retain only the most recent five days
+
+				#! journalctl	--vacuum-size=20M
+
+					retain only the most recent 20 MB
+					
